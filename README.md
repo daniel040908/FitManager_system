@@ -62,13 +62,6 @@ npm run dev
 
 Front-end: `http://localhost:5173`
 
-### Login de teste
-
-- E-mail: `admin@fitmanager.com`
-- Senha: `123456`
-
-Altere essa senha antes de usar o sistema em produção.
-
 ## Estrutura
 
 ```text
