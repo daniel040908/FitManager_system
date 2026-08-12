@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Perfil {
+  ADMIN
+  INSTRUTOR
+  ALUNO
+}
+
+enum StatusAluno {
+  ATIVO
+  INATIVO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  PAGO
+  ATRASADO
+}
+
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String   @unique
+  senha      String
+  perfil     Perfil   @default(ALUNO)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  aluno      Aluno?
+  instrutor  Instrutor?
+
+  @@map("usuarios")
+}
+
+model Aluno {
+  id          Int          @id @default(autoincrement())
+  usuarioId   Int          @unique
+  cpf         String?      @unique
+  telefone    String?
+  dataInicio  DateTime     @default(now())
+  status      StatusAluno  @default(ATIVO)
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  planoId     Int?
+  plano       Plano?       @relation(fields: [planoId], references: [id], onDelete: SetNull)
+  treinos     Treino[]
+  frequencias Frequencia[]
+  pagamentos  Pagamento[]
+
+  @@map("alunos")
+}
+
+model Instrutor {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @unique
+  cref      String?  @unique
+  telefone  String?
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  treinos   Treino[]
+
+  @@map("instrutores")
+}
+
+model Plano {
+  id         Int         @id @default(autoincrement())
+  nome       String
+  descricao  String?
+  valor      Decimal     @db.Decimal(10, 2)
+  duracaoMeses Int
+  ativo      Boolean     @default(true)
+  alunos     Aluno[]
+  pagamentos Pagamento[]
+
+  @@map("planos")
+}
+
+model Treino {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  alunoId     Int
+  instrutorId Int?
+  aluno       Aluno     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  instrutor   Instrutor? @relation(fields: [instrutorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("treinos")
+}
+
+model Frequencia {
+  id       Int      @id @default(autoincrement())
+  alunoId  Int
+  presente Boolean  @default(true)
+  horario  DateTime @default(now())
+  aluno    Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+
+  @@map("frequencias")
+}
+
+model Pagamento {
+  id         Int             @id @default(autoincrement())
+  alunoId    Int
+  planoId    Int?
+  valor      Decimal         @db.Decimal(10, 2)
+  vencimento DateTime
+  status     StatusPagamento @default(PENDENTE)
+  pagoEm     DateTime?
+  aluno      Aluno           @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  plano      Plano?          @relation(fields: [planoId], references: [id], onDelete: SetNull)
+
+  @@map("pagamentos")
+}

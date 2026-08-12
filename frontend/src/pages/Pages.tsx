@@ -1,0 +1,7 @@
+import {CrudPage} from './CrudPage';
+export const Alunos=()=> <CrudPage title="Alunos" path="/api/alunos" fields={[{key:'nome',label:'Nome'},{key:'email',label:'E-mail',type:'email'},{key:'senha',label:'Senha',type:'password'},{key:'telefone',label:'Telefone'},{key:'cpf',label:'CPF'}]}/>;
+export const Instrutores=()=> <CrudPage title="Instrutores" path="/api/instrutores" fields={[{key:'nome',label:'Nome'},{key:'email',label:'E-mail',type:'email'},{key:'senha',label:'Senha',type:'password'},{key:'cref',label:'CREF'},{key:'telefone',label:'Telefone'}]}/>;
+export const Planos=()=> <CrudPage title="Planos" path="/api/planos" fields={[{key:'nome',label:'Nome'},{key:'descricao',label:'Descrição'},{key:'valor',label:'Valor',type:'number'},{key:'duracaoMeses',label:'Duração em meses',type:'number'}]}/>;
+export const Treinos=()=> <CrudPage title="Treinos" path="/api/treinos" fields={[{key:'nome',label:'Nome'},{key:'descricao',label:'Descrição'},{key:'alunoId',label:'ID do aluno',type:'number'},{key:'instrutorId',label:'ID do instrutor',type:'number'}]}/>;
+export const Frequencias=()=> <CrudPage title="Frequências" path="/api/frequencias" fields={[{key:'alunoId',label:'ID do aluno',type:'number'}]}/>;
+export const Pagamentos=()=> <CrudPage title="Pagamentos" path="/api/pagamentos" fields={[{key:'alunoId',label:'ID do aluno',type:'number'},{key:'planoId',label:'ID do plano',type:'number'},{key:'valor',label:'Valor',type:'number'},{key:'vencimento',label:'Vencimento',type:'date'}]}/>;
