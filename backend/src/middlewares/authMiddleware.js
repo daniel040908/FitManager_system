@@ -14,7 +14,8 @@ export function autenticar(req, res, next) {
 
 export function permitir(...perfis) {
   return (req, res, next) => {
-    if (!req.usuario || !perfis.includes(req.usuario.perfil)) return res.status(403).json({ erro: 'Acesso negado.' });
+    if (!req.usuario || !perfis.includes(req.usuario.perfil)) 
+      return res.status(403).json({ erro: 'Acesso negado.' });
     next();
   };
 }
