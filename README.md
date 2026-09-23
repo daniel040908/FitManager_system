@@ -34,7 +34,7 @@ Projeto estruturado a partir da proposta do TCC enviada: uma solução digital v
 
 ### 1. Banco
 
-Crie um banco MySQL chamado `fitmanager`.
+Crie um banco MySQL chamado `academia-db`.
 
 ### 2. Back-end
 
