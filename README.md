@@ -1,6 +1,6 @@
 # FitManager — Sistema de Gestão para Academias
 
-Projeto estruturadodo TCC : uma solução digital voltada principalmente para pequenas e médias academias, com foco em cadastro digital, treinos personalizados, frequência automática e gestão financeira.
+Projeto estruturado a partir da proposta do TCC enviada: uma solução digital voltada principalmente para pequenas e médias academias, com foco em cadastro digital, treinos personalizados, frequência automática e gestão financeira.
 
 ## Stack
 
