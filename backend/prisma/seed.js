@@ -8,9 +8,10 @@ if (!process.env.DATABASE_URL) {
 }
 
 const prisma = new PrismaClient();
+const senhaInicial = 'FitManager#2026';
 
 async function main() {
-  const senha = await bcrypt.hash('123456', 10);
+  const senha = await bcrypt.hash(senhaInicial, 10);
 
   const admin = await prisma.usuario.upsert({
     where: { email: 'admin@fitmanager.com' },
@@ -55,7 +56,7 @@ async function main() {
   }
 
   console.log(`Seed concluído. Administrador: ${admin.email}`);
-  console.log('Senha inicial dos usuários de demonstração: 123456');
+  console.log(`Senha inicial dos usuários de demonstração: ${senhaInicial}`);
 }
 
 main()
