@@ -1,0 +1,193 @@
+CREATE DATABASE IF NOT EXISTS academia_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE academia_db;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS despesas;
+DROP TABLE IF EXISTS pagamentos;
+DROP TABLE IF EXISTS frequencias;
+DROP TABLE IF EXISTS treinos;
+DROP TABLE IF EXISTS instrutores;
+DROP TABLE IF EXISTS alunos;
+DROP TABLE IF EXISTS planos;
+DROP TABLE IF EXISTS usuarios;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- =========================================================
+-- 1. USUÁRIOS 
+-- =========================================================
+CREATE TABLE usuarios (
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(191) NOT NULL,
+    email VARCHAR(191) NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    perfil ENUM('ADMIN', 'INSTRUTOR', 'ALUNO') NOT NULL DEFAULT 'ALUNO',
+    createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    UNIQUE KEY usuarios_email_key (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 2. PLANOS
+-- =========================================================
+CREATE TABLE planos (
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(191) NOT NULL,
+    descricao TEXT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    duracaoMeses INT NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 3. ALUNOS
+-- =========================================================
+CREATE TABLE alunos (
+    id INT NOT NULL AUTO_INCREMENT,
+    usuarioId INT NOT NULL,
+    cpf VARCHAR(191) NULL,
+    telefone VARCHAR(191) NULL,
+    dataInicio DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    status ENUM('ATIVO', 'INATIVO') NOT NULL DEFAULT 'ATIVO',
+    planoId INT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY alunos_usuarioId_key (usuarioId),
+    UNIQUE KEY alunos_cpf_key (cpf),
+    KEY idx_alunos_planoId (planoId),
+    CONSTRAINT fk_alunos_usuario FOREIGN KEY (usuarioId) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_alunos_plano FOREIGN KEY (planoId) REFERENCES planos(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 4. INSTRUTORES
+-- =========================================================
+CREATE TABLE instrutores (
+    id INT NOT NULL AUTO_INCREMENT,
+    usuarioId INT NOT NULL,
+    cref VARCHAR(191) NULL,
+    telefone VARCHAR(191) NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY instrutores_usuarioId_key (usuarioId),
+    UNIQUE KEY instrutores_cref_key (cref),
+    CONSTRAINT fk_instrutores_usuario FOREIGN KEY (usuarioId) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 5. TREINOS
+-- =========================================================
+CREATE TABLE treinos (
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(191) NOT NULL,
+    descricao TEXT NULL,
+    alunoId INT NOT NULL,
+    instrutorId INT NULL,
+    createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    KEY idx_treinos_alunoId (alunoId),
+    KEY idx_treinos_instrutorId (instrutorId),
+    CONSTRAINT fk_treinos_aluno FOREIGN KEY (alunoId) REFERENCES alunos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_treinos_instrutor FOREIGN KEY (instrutorId) REFERENCES instrutores(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 6. FREQUÊNCIAS
+-- =========================================================
+CREATE TABLE frequencias (
+    id INT NOT NULL AUTO_INCREMENT,
+    alunoId INT NOT NULL,
+    presente BOOLEAN NOT NULL DEFAULT TRUE,
+    horario DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    KEY idx_frequencias_alunoId (alunoId),
+    KEY idx_frequencias_horario (horario),
+    CONSTRAINT fk_frequencias_aluno FOREIGN KEY (alunoId) REFERENCES alunos(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 7. PAGAMENTOS
+-- =========================================================
+CREATE TABLE pagamentos (
+    id INT NOT NULL AUTO_INCREMENT,
+    alunoId INT NOT NULL,
+    planoId INT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    vencimento DATETIME(3) NOT NULL,
+    status ENUM('PENDENTE', 'PAGO', 'ATRASADO') NOT NULL DEFAULT 'PENDENTE',
+    pagoEm DATETIME(3) NULL,
+    PRIMARY KEY (id),
+    KEY idx_pagamentos_alunoId (alunoId),
+    KEY idx_pagamentos_planoId (planoId),
+    KEY idx_pagamentos_status (status),
+    KEY idx_pagamentos_vencimento (vencimento),
+    CONSTRAINT fk_pagamentos_aluno FOREIGN KEY (alunoId) REFERENCES alunos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_pagamentos_plano FOREIGN KEY (planoId) REFERENCES planos(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- 8. DESPESAS
+-- =========================================================
+CREATE TABLE despesas (
+    id INT NOT NULL AUTO_INCREMENT,
+    descricao VARCHAR(191) NOT NULL,
+    categoria VARCHAR(191) NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    data DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    usuarioId INT NULL,
+    PRIMARY KEY (id),
+    KEY idx_despesas_data (data),
+    KEY idx_despesas_categoria (categoria),
+    KEY idx_despesas_usuarioId (usuarioId),
+    CONSTRAINT fk_despesas_usuario FOREIGN KEY (usuarioId) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- DADOS INICIAIS (PLANOS E USUÁRIOS)
+-- =========================================================
+INSERT INTO planos (nome, descricao, valor, duracaoMeses, ativo) VALUES
+('Plano Básico', 'Acesso à academia', 79.90, 1, TRUE),
+('Plano Premium', 'Acesso completo com acompanhamento', 129.90, 1, TRUE),
+('Plano Trimestral', 'Plano com duração de três meses', 329.90, 3, TRUE);
+
+-- Senha inicial de 12 caracteres (FitManager@1) -> 1 maiúscula, minúsculas e 1 especial
+INSERT INTO usuarios (nome, email, senha, perfil) VALUES
+('Administrador', 'admin@fitmanager.com', 'FitManager@1', 'ADMIN'),
+('João Silva', 'joao@fitmanager.com', 'FitManager@1', 'ALUNO'),
+('Carlos Instrutor', 'carlos@fitmanager.com', 'FitManager@1', 'INSTRUTOR');
+
+INSERT INTO alunos (usuarioId, cpf, telefone, status, planoId) VALUES
+((SELECT id FROM usuarios WHERE email = 'joao@fitmanager.com'), '12345678901', '(11) 99999-1111', 'ATIVO', (SELECT id FROM planos WHERE nome = 'Plano Premium' LIMIT 1));
+
+INSERT INTO instrutores (usuarioId, cref, telefone) VALUES
+((SELECT id FROM usuarios WHERE email = 'carlos@fitmanager.com'), 'CREF-123456-G/SP', '(11) 99999-2222');
+
+-- =========================================================
+-- VIEWS DE CONSULTA
+-- =========================================================
+CREATE OR REPLACE VIEW vw_alunos AS
+SELECT a.id, u.nome, u.email, a.cpf, a.telefone, a.dataInicio, a.status, p.id AS planoId, p.nome AS plano, p.valor AS valorPlano
+FROM alunos a
+INNER JOIN usuarios u ON u.id = a.usuarioId
+LEFT JOIN planos p ON p.id = a.planoId;
+
+CREATE OR REPLACE VIEW vw_treinos AS
+SELECT t.id, t.nome, t.descricao, t.alunoId, aluno.nome AS aluno, t.instrutorId, instrutor.nome AS instrutor, t.createdAt, t.updatedAt
+FROM treinos t
+INNER JOIN alunos a ON a.id = t.alunoId
+INNER JOIN usuarios aluno ON aluno.id = a.usuarioId
+LEFT JOIN instrutores i ON i.id = t.instrutorId
+LEFT JOIN usuarios instrutor ON instrutor.id = i.usuarioId;
+
+CREATE OR REPLACE VIEW vw_pagamentos AS
+SELECT pg.id, pg.alunoId, aluno.nome AS aluno, pg.planoId, p.nome AS plano, pg.valor, pg.vencimento, pg.status, pg.pagoEm
+FROM pagamentos pg
+INNER JOIN alunos a ON a.id = pg.alunoId
+INNER JOIN usuarios aluno ON aluno.id = a.usuarioId
+LEFT JOIN planos p ON p.id = pg.planoId;

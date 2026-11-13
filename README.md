@@ -500,31 +500,19 @@ A API utiliza autenticação Bearer Token com JWT nas rotas protegidas.
 
 ---
 
-## 🔐 Usuários de demonstração
-
-O projeto disponibiliza três usuários de demonstração criados pelo comando `npm run seed`.
-
-Todos possuem a senha inicial:
-
-```text
-123456
-```
-
-| Perfil | E-mail | Senha |
-|---|---|---|
-| ADMIN | admin@fitmanager.com | 123456 |
-| INSTRUTOR | instrutor@fitmanager.com | 123456 |
-| ALUNO | aluno@fitmanager.com | 123456 |
-
 ### Observações sobre o Seed
 
-O comando `npm run seed` atualiza as senhas desses três usuários de demonstração para o hash bcrypt correspondente à senha `123456`, inclusive quando os usuários já existem.
+O comando `npm run seed` atualiza as senhas desses três usuários de demonstração para o hash bcrypt correspondente a `FitManager#2026`, inclusive quando os usuários já existem.
 
 O seed foi desenvolvido para evitar duplicação dos registros de demonstração.
 
+### Validação de senha no login
+
+A senha deve ter pelo menos 12 caracteres, conter ao menos uma letra maiúscula e uma minúscula, e pode conter no máximo um caractere especial. Números são permitidos; não são obrigatórios. A senha inicial do seed atende a essas regras.
+
 **Importante:**
 - Execute o seed somente em ambientes de desenvolvimento ou teste.
-- O seed pode atualizar senhas de usuários existentes que correspondam às contas de demonstração.
+- O seed redefine a senha das contas de demonstração para `FitManager#2026`, inclusive se elas já existirem.
 - Altere as credenciais antes de qualquer implantação real.
 - Nunca utilize as senhas de demonstração em produção.
 
@@ -640,7 +628,7 @@ FitManager_system/
 │   │   ├── routes/
 │   │   └── ...
 │   │
-│   ├── .env.example
+│   ├── .env
 │   └── package.json
 │
 ├── frontend/
@@ -655,6 +643,7 @@ FitManager_system/
 │   └── package.json
 │
 ├── database/
+    └── 01_database_completo.sql
 │   └── 02_migracao_despesas.sql
 
 │

@@ -50,6 +50,6 @@ Se o banco já existe, não execute `prisma db push` sem antes conferir o schema
 4. Execute `03_verificar_login.sql` no HeidiSQL para conferir se a tabela `usuarios` existe e quais e-mails estão cadastrados.
 5. Para criar/atualizar os usuários de demonstração com hash bcrypt válido, execute `npm run seed` dentro de `backend`.
 
-O seed disponibiliza `admin@fitmanager.com`, `instrutor@fitmanager.com` e `aluno@fitmanager.com`, todos com senha inicial `123456`. O e-mail `daniel@gmail.com` da captura não é criado pelo seed; use um dos e-mails listados ou cadastre esse usuário pela aplicação depois que o login administrativo funcionar.
+O seed disponibiliza `admin@fitmanager.com`, `instrutor@fitmanager.com` e `aluno@fitmanager.com`, todos com senha inicial `FitManager#2026`. Essa senha atende à validação do login: mínimo de 12 caracteres, pelo menos uma letra maiúscula e uma minúscula, e no máximo um caractere especial. Ao executar `npm run seed`, as senhas dessas contas são redefinidas para esse valor. O e-mail `daniel@gmail.com` mencionado na captura não é criado pelo seed; para testar, use uma das contas de demonstração.
 
 **Não execute novamente o SQL original que contém `DROP TABLE IF EXISTS`** para corrigir o login. Ele apaga as tabelas e os registros. O hash bcrypt do usuário administrador presente naquele SQL também não deve ser considerado uma senha funcional; use o seed para gerar hashes corretos.
