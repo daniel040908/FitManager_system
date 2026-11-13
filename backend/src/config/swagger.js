@@ -20,6 +20,7 @@ export const swaggerSpec = {
   },
   paths: {
     '/health': { get: { summary: 'Verificar disponibilidade da API', responses: { 200: { description: 'API funcionando' } } } },
+    '/health/db': { get: { summary: 'Verificar conexão com o banco de dados', responses: { 200: { description: 'Banco conectado' }, 503: { description: 'Banco indisponível' } } } },
     '/auth/login': {
       post: {
         summary: 'Autenticar usuário',

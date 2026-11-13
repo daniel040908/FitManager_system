@@ -27,6 +27,7 @@ app.get('/health/db', async (_req, res) => {
     return res.status(503).json({ status: 'error', database: 'unavailable', message: 'Confira DATABASE_URL, MySQL e se o banco academia_db existe.' });
   }
 });
+app.get('/docs.json', (_req, res) => res.json(swaggerSpec));
 app.use('/auth', authRoutes);
 app.use('/api', routes);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

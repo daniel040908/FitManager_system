@@ -1,97 +1,686 @@
-# FitManager — Sistema de Gestão para Academias
+# 🏋️ FitManager — Sistema de Gestão para Academias
 
-Aplicação web para gestão de academias, com frontend React + TypeScript + Vite e API Node.js + Express + Prisma + MySQL.
+**FitManager** é uma aplicação web desenvolvida para facilitar e modernizar a administração de academias de pequeno e médio porte, centralizando o gerenciamento de alunos, instrutores, planos, treinos, frequências, pagamentos e despesas em uma única plataforma.
 
-## Tecnologias
+O sistema tem como objetivo reduzir processos manuais, melhorar a organização administrativa, facilitar o acompanhamento dos alunos e fornecer informações que auxiliem na tomada de decisões e no controle financeiro da academia.
 
-- Frontend: React, TypeScript, Vite e React Router
-- Backend: Node.js e Express
-- Banco de dados: MySQL 8+
-- ORM: Prisma
-- Autenticação: JWT e bcrypt
-- Documentação: Swagger em `/docs`
+A aplicação utiliza uma arquitetura composta por frontend independente, API REST e banco de dados relacional, garantindo organização, segurança e facilidade de manutenção.
 
-## Perfis de acesso
+---
 
-- **ADMIN:** gerencia cadastros, planos, treinos, frequências e pagamentos.
-- **INSTRUTOR:** consulta alunos, planos, treinos atribuídos e frequências; gerencia os treinos sob sua responsabilidade.
-- **ALUNO:** consulta seus próprios treinos, frequências, pagamentos e planos. Os dados de outros alunos não são retornados.
+## 📌 Sumário
 
-## Preparação do banco
+- [Sobre o projeto](#-sobre-o-projeto)
+- [Objetivos](#-objetivos)
+- [Principais funcionalidades](#-principais-funcionalidades)
+- [Tecnologias utilizadas](#-tecnologias-utilizadas)
+- [Arquitetura do sistema](#-arquitetura-do-sistema)
+- [Perfis de acesso](#-perfis-de-acesso)
+- [Estrutura do banco de dados](#-estrutura-do-banco-de-dados)
+- [Requisitos para instalação](#-requisitos-para-instalação)
+- [Instalação e configuração](#-instalação-e-configuração)
+- [Configuração do banco de dados](#-configuração-do-banco-de-dados)
+- [Execução do backend](#-execução-do-backend)
+- [Execução do frontend](#-execução-do-frontend)
+- [Documentação da API](#-documentação-da-api)
+- [Usuários de demonstração](#-usuários-de-demonstração)
+- [Segurança e autenticação](#-segurança-e-autenticação)
+- [Principais ajustes desta versão](#-principais-ajustes-desta-versão)
+- [Limitações e melhorias futuras](#-limitações-e-melhorias-futuras)
+- [Considerações finais](#-considerações-finais)
 
-O schema Prisma utiliza as tabelas `usuarios`, `alunos`, `instrutores`, `planos`, `treinos`, `frequencias`, `pagamentos` e `despesas`. A tabela `despesas` é a única adição desta revisão; aplique o script `database/02_migracao_despesas.sql` antes de usar o módulo.
+---
 
-Se o banco já foi criado pelo script SQL fornecido, **não execute novamente o script que contém `DROP TABLE`**, pois ele apaga as tabelas e os dados. Nesse caso, configure o `DATABASE_URL` e execute apenas `npx prisma generate`.
+## 📖 Sobre o projeto
 
-Para um banco novo, crie `academia_db` no MySQL e execute:
+O FitManager surgiu da necessidade de melhorar a gestão administrativa e operacional de academias que ainda utilizam planilhas, documentos físicos ou ferramentas descentralizadas para controlar suas atividades.
+
+A falta de integração entre informações de alunos, pagamentos, planos e frequências pode gerar retrabalho, inconsistências nos registros e dificuldades no acompanhamento das atividades.
+
+Para solucionar esses problemas, foi desenvolvido um sistema que centraliza as principais operações de uma academia, permitindo que cada usuário acesse funcionalidades de acordo com seu perfil e suas permissões.
+
+O projeto foi desenvolvido utilizando React, TypeScript, Node.js, Express, Prisma e MySQL.
+
+## 🎯 Objetivos
+
+### Objetivo geral
+
+Desenvolver um sistema web para gerenciamento de academias, proporcionando maior controle sobre informações administrativas, financeiras e operacionais.
+
+### Objetivos específicos
+
+- Centralizar o cadastro e gerenciamento de alunos e instrutores.
+- Organizar os planos oferecidos pela academia.
+- Permitir a criação e atribuição de treinos.
+- Registrar e consultar frequências dos alunos.
+- Controlar pagamentos e despesas.
+- Disponibilizar informações financeiras e operacionais.
+- Implementar autenticação e controle de acesso por perfil.
+- Garantir a integridade e o relacionamento dos dados no banco de dados.
+- Facilitar a navegação por meio de uma interface intuitiva e responsiva.
+
+## ⚙️ Principais funcionalidades
+
+### Gestão de usuários
+- Cadastro de usuários.
+- Edição e exclusão de registros.
+- Autenticação por e-mail e senha.
+- Controle de permissões por perfil.
+- Gerenciamento de informações dos usuários.
+
+### Gestão de alunos
+- Cadastro e gerenciamento de alunos.
+- Consulta de informações cadastrais.
+- Controle de situação do aluno.
+- Relacionamento com planos e pagamentos.
+- Acompanhamento de treinos e frequências.
+
+### Gestão de instrutores
+- Cadastro e gerenciamento de instrutores.
+- Consulta de informações profissionais.
+- Associação de instrutores aos treinos.
+- Visualização dos alunos e treinos relacionados às suas responsabilidades.
+
+### Gestão de planos
+- Cadastro de planos.
+- Edição e exclusão de planos.
+- Consulta dos planos disponíveis.
+- Controle das informações relacionadas aos planos dos alunos.
+
+### Gestão de treinos
+- Cadastro de treinos.
+- Edição e exclusão de treinos.
+- Associação de treinos aos alunos.
+- Associação de instrutores responsáveis.
+- Consulta dos treinos conforme as permissões do usuário.
+
+### Controle de frequências
+- Registro de frequência dos alunos.
+- Consulta do histórico de frequências.
+- Acompanhamento da participação dos alunos.
+- Restrição de acesso às informações conforme o perfil autenticado.
+
+### Gestão de pagamentos
+- Cadastro de pagamentos.
+- Atualização de informações financeiras.
+- Consulta de pagamentos.
+- Controle de situações de pagamento.
+- Relacionamento entre alunos e planos.
+
+### Gestão de despesas
+- Cadastro e gerenciamento de despesas.
+- Consulta dos registros financeiros.
+- Organização das informações de gastos.
+- Apoio ao acompanhamento financeiro da academia.
+
+### Relatórios e indicadores
+- Consulta de informações financeiras e operacionais.
+- Visualização de dados relacionados aos pagamentos e despesas.
+- Apoio à administração e ao acompanhamento da academia.
+
+### Recursos de interface
+- Navegação adaptada aos perfis de acesso.
+- Busca nas listagens.
+- Paginação local.
+- Formulários integrados à API.
+- Operações de edição e exclusão conforme as permissões.
+- Interface organizada para facilitar a utilização do sistema.
+
+---
+
+## 💻 Tecnologias utilizadas
+
+O projeto utiliza tecnologias modernas para desenvolvimento frontend, backend e gerenciamento de dados.
+
+| Camada | Tecnologia | Finalidade |
+|---|---|---|
+| Frontend | React | Construção da interface |
+| Linguagem frontend | TypeScript | Tipagem e organização do código |
+| Ferramenta de desenvolvimento | Vite | Inicialização e execução do frontend |
+| Navegação | React Router | Gerenciamento de rotas |
+| Backend | Node.js | Ambiente de execução |
+| Framework backend | Express | Desenvolvimento da API REST |
+| Banco de dados | MySQL 8+ | Armazenamento das informações |
+| ORM | Prisma | Comunicação com o banco |
+| Autenticação | JWT | Autenticação e autorização |
+| Criptografia de senhas | bcrypt | Proteção das senhas |
+| Documentação | Swagger | Documentação dos endpoints |
+| Controle de versão | Git e GitHub | Versionamento do projeto |
+
+---
+
+## 🏗️ Arquitetura do sistema
+
+O FitManager utiliza uma arquitetura dividida em três partes principais:
+
+**1. Frontend**
+
+Responsável pela interface visual e pela interação dos usuários com o sistema. Desenvolvido com React, TypeScript e Vite.
+
+**2. Backend**
+
+Responsável pelas regras de negócio, autenticação, validações, permissões e comunicação com o banco de dados. Desenvolvido com Node.js e Express.
+
+**3. Banco de dados**
+
+Responsável pelo armazenamento e relacionamento das informações. Utiliza MySQL com Prisma ORM.
+
+### Fluxo de comunicação
+
+```text
+┌──────────────────────────────┐
+│          FRONTEND            │
+│                              │
+│      React + TypeScript      │
+│             Vite             │
+└──────────────┬───────────────┘
+               │
+               │ Requisições HTTP
+               │ JSON + JWT
+               ▼
+┌──────────────────────────────┐
+│           BACKEND            │
+│                              │
+│        Node.js + Express     │
+│                              │
+│  Controllers / Routes        │
+│  Middlewares / Validações    │
+│  Autenticação JWT            │
+│                              │
+└──────────────┬───────────────┘
+               │
+               │ Prisma ORM
+               ▼
+┌──────────────────────────────┐
+│        BANCO DE DADOS         │
+│                              │
+│           MySQL 8+           │
+│                              │
+│  Usuários / Alunos           │
+│  Instrutores / Planos        │
+│  Treinos / Frequências       │
+│  Pagamentos / Despesas       │
+└──────────────────────────────┘
+```
+
+---
+
+## 👥 Perfis de acesso
+
+O sistema possui três perfis de acesso, com permissões específicas para cada tipo de usuário.
+
+### ADMIN — Administrador
+
+Possui acesso administrativo ao sistema.
+
+Permissões:
+- Gerenciar usuários.
+- Gerenciar alunos.
+- Gerenciar instrutores.
+- Gerenciar planos.
+- Gerenciar treinos.
+- Consultar e gerenciar frequências.
+- Gerenciar pagamentos.
+- Gerenciar despesas.
+- Consultar informações financeiras e operacionais.
+
+### INSTRUTOR — Instrutor
+
+Possui acesso às funcionalidades relacionadas ao acompanhamento dos alunos e à gestão dos treinos sob sua responsabilidade.
+
+Permissões:
+- Consultar alunos.
+- Consultar planos.
+- Visualizar treinos atribuídos.
+- Gerenciar os treinos sob sua responsabilidade.
+- Consultar frequências conforme suas permissões.
+
+### ALUNO — Aluno
+
+Possui acesso restrito às próprias informações.
+
+Permissões:
+- Consultar seus próprios dados.
+- Visualizar seus treinos.
+- Consultar suas frequências.
+- Consultar seus pagamentos.
+- Consultar seu plano.
+
+**Importante:** os dados de outros alunos não são retornados nas consultas destinadas ao perfil ALUNO.
+
+---
+
+## 🗄️ Estrutura do banco de dados
+
+O banco de dados utilizado pelo FitManager é o MySQL 8+, com gerenciamento de estrutura e relacionamentos por meio do Prisma ORM.
+
+O projeto utiliza as seguintes tabelas principais:
+
+| Tabela | Descrição |
+|---|---|
+| `usuarios` | Armazena os dados de autenticação e perfil dos usuários. |
+| `alunos` | Armazena informações dos alunos cadastrados. |
+| `instrutores` | Armazena informações dos instrutores. |
+| `planos` | Armazena os planos disponibilizados pela academia. |
+| `treinos` | Armazena os treinos cadastrados e suas associações. |
+| `frequencias` | Registra a frequência dos alunos. |
+| `pagamentos` | Armazena os registros de pagamentos. |
+| `despesas` | Armazena as despesas administrativas e financeiras. |
+
+### Relacionamentos
+
+O banco utiliza relacionamentos entre as entidades para manter a integridade dos dados e evitar duplicidade desnecessária de informações.
+
+Entre os relacionamentos estão:
+
+- Usuários associados a alunos ou instrutores.
+- Alunos associados a planos.
+- Treinos associados a alunos e instrutores.
+- Frequências relacionadas aos alunos.
+- Pagamentos relacionados aos alunos e planos.
+- Despesas registradas para controle financeiro.
+
+A estrutura completa dos relacionamentos pode ser consultada no arquivo `schema.prisma`.
+
+---
+
+## 📋 Requisitos para instalação
+
+Antes de executar o projeto, é necessário possuir as seguintes ferramentas instaladas:
+
+- [Node.js](https://nodejs.org/) — versão compatível com as dependências do projeto.
+- [npm](https://www.npmjs.com/) — gerenciador de pacotes.
+- [MySQL 8+](https://dev.mysql.com/downloads/mysql/) — banco de dados.
+- [Git](https://git-scm.com/) — controle de versão.
+- [HeidiSQL](https://www.heidisql.com/) — opcional, para gerenciamento visual do banco.
+- Visual Studio Code ou outro editor de código.
+
+---
+
+## 🚀 Instalação e configuração
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/daniel040908/FitManager_system.git
+```
+
+Acessar a pasta:
+
+```bash
+cd FitManager_system
+```
+
+### 2. Instalar as dependências do backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Edite DATABASE_URL e JWT_SECRET
-npx prisma db push
-npx prisma generate
-npm run seed
-npm run dev
 ```
 
-O comando `prisma db push` sincroniza o schema sem criar migrations. Em banco que já contém dados, faça backup antes de qualquer alteração de estrutura e prefira validar o estado com `npx prisma db pull` antes de sincronizar.
+### 3. Configurar as variáveis de ambiente
 
-## Backend
+Crie o arquivo `.env` dentro da pasta `backend`, utilizando o `.env.example` como referência.
 
-```bash
-cd backend
-npm install
-cp .env.example .env
-npx prisma generate
-npm run dev
+Exemplo:
+
+```env
+PORT=3000
+
+DATABASE_URL="mysql://root:root@localhost:3306/academia_db"
+
+JWT_SECRET="sua_chave_secreta"
+
+JWT_EXPIRES_IN="8h"
+
+CORS_ORIGIN="http://localhost:5173"
 ```
 
-- API: `http://localhost:3000`
-- Health check: `http://localhost:3000/health`
-- Swagger: `http://localhost:3000/docs`
+**Atenção:**
+- Ajuste o usuário e a senha conforme a configuração do seu MySQL.
+- O banco `academia_db` precisa existir.
+- Utilize uma chave JWT segura e exclusiva em ambientes reais.
+- Nunca compartilhe o arquivo `.env` ou envie credenciais para o GitHub.
 
-## Frontend
+### 4. Configurar o frontend
 
 Em outro terminal:
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env
+```
+
+Crie o arquivo `.env` utilizando o `.env.example` como referência.
+
+Configure a URL da API de acordo com o nome da variável utilizada no código do frontend.
+
+---
+
+## 🛠️ Configuração do banco de dados
+
+O schema Prisma utiliza as tabelas:
+
+`usuarios`, `alunos`, `instrutores`, `planos`, `treinos`, `frequencias`, `pagamentos` e `despesas`.
+
+A tabela `despesas` é a única adição desta revisão. Aplique o script:
+
+```text
+database/02_migracao_despesas.sql
+```
+
+antes de utilizar o módulo de despesas.
+
+### Banco de dados já existente
+
+Se o banco já foi criado pelo script SQL fornecido no projeto:
+
+1. Não execute novamente o script que contém `DROP TABLE`.
+2. Configure corretamente o `DATABASE_URL`.
+3. Execute:
+
+```bash
+cd backend
+npx prisma generate
+```
+
+Isso permite gerar o Prisma Client sem recriar as tabelas ou apagar os registros existentes.
+
+### Banco de dados novo
+
+Se estiver configurando o projeto pela primeira vez:
+
+1. Crie o banco `academia_db` no MySQL.
+2. Configure o arquivo `.env`.
+3. Execute os comandos:
+
+```bash
+cd backend
+
+npm install
+
+npx prisma db push
+
+npx prisma generate
+
+npm run seed
+
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`
+**Observação sobre o Prisma:**
 
-## Usuários de demonstração
+O comando `prisma db push` sincroniza a estrutura do banco com o schema Prisma sem criar migrations.
 
-O seed cria os seguintes usuários com a senha inicial `123456`:
+Em bancos que já possuem dados, faça backup antes de qualquer alteração estrutural. É recomendado verificar previamente a estrutura existente com:
 
-| Perfil | E-mail |
+```bash
+npx prisma db pull
+```
+
+Compare o resultado com o `schema.prisma` do projeto antes de sincronizar as alterações.
+
+---
+
+## 🔧 Execução do backend
+
+Dentro da pasta `backend`, execute:
+
+```bash
+npm install
+```
+
+Caso ainda não tenha configurado o Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Para iniciar o servidor em desenvolvimento:
+
+```bash
+npm run dev
+```
+
+O backend será disponibilizado em:
+
+| Serviço | Endereço |
 |---|---|
-| ADMIN | admin@fitmanager.com |
-| INSTRUTOR | instrutor@fitmanager.com |
-| ALUNO | aluno@fitmanager.com |
+| API | http://localhost:3000 |
+| Health Check | http://localhost:3000/health |
+| Swagger | http://localhost:3000/docs |
 
-O `npm run seed` atualiza as senhas desses três usuários de demonstração para o hash bcrypt da senha `123456`, inclusive se já existirem. Execute o seed apenas em ambiente de desenvolvimento/teste. Altere as senhas antes de qualquer implantação real. Não utilize as credenciais de demonstração em produção.
+### Health Check
 
-## Principais ajustes desta versão
+O endpoint `/health` permite verificar a disponibilidade do servidor.
 
-- Formulários e listagens do frontend conectados aos endpoints da API.
+---
+
+## 🎨 Execução do frontend
+
+Em outro terminal, acesse a pasta `frontend`:
+
+```bash
+cd frontend
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Configure o arquivo `.env` conforme o `.env.example`.
+
+Inicie a aplicação:
+
+```bash
+npm run dev
+```
+
+O frontend estará disponível em:
+
+**http://localhost:5173**
+
+---
+
+## 📚 Documentação da API
+
+A API do FitManager utiliza Swagger para documentar suas rotas e facilitar a consulta e realização de requisições HTTP.
+
+A documentação pode ser acessada pelo navegador:
+
+**http://localhost:3000/docs**
+
+A documentação apresenta os endpoints disponíveis, seus parâmetros, respostas e esquemas de autenticação. O arquivo OpenAPI também pode ser consultado em **http://localhost:3000/docs.json**.
+
+Ao iniciar o backend com `npm run dev` ou `npm start`, o CMD exibe os endereços da documentação e a lista de rotas documentadas.
+
+A API utiliza autenticação Bearer Token com JWT nas rotas protegidas.
+
+---
+
+## 🔐 Usuários de demonstração
+
+O projeto disponibiliza três usuários de demonstração criados pelo comando `npm run seed`.
+
+Todos possuem a senha inicial:
+
+```text
+123456
+```
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| ADMIN | admin@fitmanager.com | 123456 |
+| INSTRUTOR | instrutor@fitmanager.com | 123456 |
+| ALUNO | aluno@fitmanager.com | 123456 |
+
+### Observações sobre o Seed
+
+O comando `npm run seed` atualiza as senhas desses três usuários de demonstração para o hash bcrypt correspondente à senha `123456`, inclusive quando os usuários já existem.
+
+O seed foi desenvolvido para evitar duplicação dos registros de demonstração.
+
+**Importante:**
+- Execute o seed somente em ambientes de desenvolvimento ou teste.
+- O seed pode atualizar senhas de usuários existentes que correspondam às contas de demonstração.
+- Altere as credenciais antes de qualquer implantação real.
+- Nunca utilize as senhas de demonstração em produção.
+
+---
+
+## 🛡️ Segurança e autenticação
+
+O FitManager utiliza mecanismos básicos de segurança para proteger o acesso às funcionalidades e informações.
+
+### Autenticação JWT
+
+O sistema utiliza JSON Web Token para identificar usuários autenticados.
+
+Após o login, o backend disponibiliza um token que deve ser enviado nas requisições às rotas protegidas.
+
+### Criptografia de senhas
+
+As senhas são protegidas utilizando bcrypt, evitando o armazenamento de senhas em texto puro.
+
+### Controle de permissões
+
+As funcionalidades são disponibilizadas conforme o perfil do usuário autenticado:
+
+- ADMIN.
+- INSTRUTOR.
+- ALUNO.
+
+### Proteção de dados
+
+As consultas de informações pessoais respeitam as permissões do usuário.
+
+O perfil ALUNO possui acesso restrito aos próprios dados, enquanto o INSTRUTOR tem acesso às informações relacionadas às suas responsabilidades.
+
+---
+
+## 🔄 Principais ajustes desta versão
+
+Esta versão apresenta melhorias na integração entre frontend, backend e banco de dados.
+
+### Backend
+- Integração das operações de cadastro, consulta, edição e exclusão com o banco de dados.
+- Ajustes nos endpoints utilizados pelo frontend.
+- Validações básicas de entrada.
+- Tratamento de conflitos e erros do Prisma.
+- Implementação de restrições de acesso conforme o perfil.
+- Ajustes nas consultas de treinos, frequências e pagamentos.
+- Seed idempotente para os usuários de demonstração.
+
+### Frontend
+- Formulários e listagens conectados aos endpoints da API.
 - Operações de edição e exclusão adicionadas aos módulos com permissão.
-- Token e usuário armazenados separadamente; logout não limpa outros dados do navegador.
 - Navegação adaptada aos perfis ADMIN, INSTRUTOR e ALUNO.
+- Armazenamento separado do token e das informações do usuário.
+- Logout sem limpeza de outros dados do navegador.
+- Remoção de dados de login pré-preenchidos.
+- Remoção de textos de demonstração desnecessários.
+- Busca e paginação local nas listagens.
+
+### Banco de dados e regras de negócio
 - Consultas de treinos, frequências e pagamentos filtradas para o aluno autenticado.
-- Instrutores veem os treinos atribuídos a eles.
-- Validações básicas de entrada e respostas para conflitos do Prisma.
-- Seed idempotente para evitar duplicação dos dados de demonstração.\n- Módulo de despesas e relatório financeiro/operacional para administradores.\n- Busca e paginação local nas listagens.
-- Remoção de dados de login pré-preenchidos e textos de demonstração desnecessários da interface.
+- Instrutores visualizam os treinos atribuídos a eles.
+- Inclusão do módulo de despesas.
+- Inclusão de informações para relatórios financeiros e operacionais.
+- Preservação da estrutura existente do banco, com migração específica para despesas.
 
-## Observações
+---
 
-- A API não inclui recuperação de senha ou envio de e-mail.
-- O frontend apresenta IDs de relacionamento nos formulários de treinos e pagamentos; para uso operacional, o próximo aprimoramento recomendado é trocar esses campos por seletores carregados da API.
-- Testes automatizados e implantação em produção ainda precisam ser configurados.
-"# FitManager_system" 
+## 🚧 Limitações e melhorias futuras
+
+Apesar das funcionalidades implementadas, algumas melhorias podem ser realizadas para ampliar a qualidade e a maturidade do sistema.
+
+### Melhorias recomendadas
+
+- Implementar recuperação de senha.
+- Desenvolver envio de e-mails para recuperação e notificações.
+- Substituir campos de IDs de relacionamento por seletores dinâmicos carregados diretamente da API nos formulários de treinos e pagamentos.
+- Implementar testes automatizados para frontend e backend.
+- Melhorar os relatórios financeiros com filtros por período.
+- Implementar paginação diretamente no backend para grandes volumes de registros.
+- Aprimorar a responsividade em diferentes dispositivos.
+- Configurar implantação em ambiente de produção.
+- Implementar monitoramento e registro de erros.
+- Revisar configurações de segurança para implantação pública.
+
+### Limitações conhecidas
+
+- A API ainda não possui recuperação de senha ou envio de e-mails.
+- Os formulários de treinos e pagamentos ainda apresentam IDs de relacionamento em vez de seletores dinâmicos.
+- Os testes automatizados ainda precisam ser configurados.
+- A implantação em produção ainda precisa ser preparada.
+
+---
+
+## 📁 Organização geral do projeto
+
+A aplicação está dividida em duas partes principais:
+
+```text
+FitManager_system/
+│
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── seed.js
+│   │
+│   ├── database/
+│   │
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middlewares/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── ...
+│   │
+│   ├── .env.example
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── ...
+│   │
+│   ├── .env.example
+│   └── package.json
+│
+├── database/
+│   └── 02_migracao_despesas.sql
+
+│
+└── README.md
+```
+
+
+
+---
+
+## 📌 Considerações finais
+
+O FitManager busca oferecer uma solução integrada para o gerenciamento de academias, reunindo funcionalidades administrativas, operacionais e financeiras em uma única aplicação.
+
+Por meio da integração entre React, Node.js, Express, Prisma e MySQL, o projeto permite centralizar informações, organizar processos e estabelecer controles de acesso específicos para administradores, instrutores e alunos.
+
+Além de atender às necessidades básicas de gerenciamento, o sistema apresenta uma estrutura que permite futuras expansões, melhorias e novas funcionalidades.
+
+**FitManager — Mais organização, controle e eficiência para a gestão de academias.**
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+**Daniel de Campos Medeiros**
+
+Projeto acadêmico desenvolvido com foco em Engenharia de Software, Desenvolvimento Web, Banco de Dados e integração entre frontend e backend.
+
+**Repositório:** https://github.com/daniel040908/FitManager_system
